@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CACOUNT💩</title>
+<title>CACOUNT 💩</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CACOUNT 💩">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" href="https://emojicdn.elk.sh/💩">
 <link rel="apple-touch-icon" href="https://emojicdn.elk.sh/💩">
@@ -20,8 +21,29 @@
   h1 { margin: 50px 0 10px 0; font-size: 1.2rem; letter-spacing: 4px; color: #5d4037; opacity: 0.6; }
 
   #mainContainer { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; margin-top: -5vh; }
-  #poopBtn { font-size: 45vw; background: none; border: none; cursor: pointer; transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; }
+  
+  #poopBtn { 
+    font-size: 45vw; background: none; border: none; cursor: pointer; 
+    transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; 
+    z-index: 2;
+  }
   #poopBtn:active { transform: scale(1.1); }
+
+  /* --- 1. AJUSTE DE LA ANIMACIÓN +1 (Ahora en capa superior) --- */
+  .floating-plus {
+    position: fixed; /* Mejor fixed para que la posición sea exacta sobre la pantalla */
+    font-size: 3.5rem; /* Un pelín más grande para que se vea mejor */
+    font-weight: bold; 
+    color: #795548;
+    pointer-events: none; 
+    animation: floatUp 0.9s ease-out forwards; /* Un poco más lenta para disfrutarla */
+    z-index: 2000; /* Super alto para estar POR ENCIMA de los formularios (z-index 20/1000) */
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-120px); opacity: 0; } /* Sube un poco más */
+  }
 
   .overlay-box { 
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -34,12 +56,12 @@
   textarea { width: 100%; height: 60px; border-radius: 12px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; margin: 10px 0; font-family: inherit; }
   
   button { border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+  .btn-yes { background: #5d4037; color: white; width: 100%; margin-bottom: 8px; }
+  .btn-no { background: #f5f5f5; color: #888; width: 100%; margin-bottom: 8px; }
   .btn-save { background: #5d4037; color: white; width: 100%; margin-bottom: 8px; }
-  .btn-perfect { background: #4caf50; color: white; width: 100%; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-cancel { background: #f5f5f5; color: #888; width: 100%; margin-top: 5px; }
+  .btn-perfect { background: #4caf50; color: white; width: 100%; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
 
   #statsBtn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; border-radius: 50%; width: 60px; height: 60px; z-index: 10; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 11px; }
-
   #statsBox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 1000; overflow-y: auto; padding: 25px; box-sizing: border-box; text-align: left; }
   
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -56,14 +78,20 @@
 
 <body>
 
-<h1>CACOUNT💩</h1>
+<h1>CACOUNT </h1>
 
 <div id="mainContainer">
   <button id="poopBtn">💩</button>
 </div>
 
+<div id="preForm" class="overlay-box hidden">
+  <p style="margin: 0 0 15px 0; font-weight: bold;">¿Quieres hablar de tu caca?</p>
+  <button class="btn-yes" onclick="openDetailsForm()">SÍ</button>
+  <button class="btn-no" onclick="closeWithDefault()">NO</button>
+</div>
+
 <div id="form" class="overlay-box hidden">
-  <p style="margin: 0; font-weight: bold;">¿Cómo ha sido el evento?</p>
+  <p style="margin: 0; font-weight: bold;">¡Cuéntame!</p>
   <div class="range-container">
     <span>🥵</span>
     <input type="range" min="0" max="10" id="rating" value="5" oninput="document.getElementById('valRange').innerText = this.value">
@@ -73,15 +101,14 @@
   <button class="btn-perfect" onclick="savePerfect()">✨ ¡PERFECT! ✨</button>
   <textarea id="desc" placeholder="Nota opcional..."></textarea>
   <button class="btn-save" onclick="saveDetails()">GUARDAR</button>
-  <button class="btn-cancel" onclick="closeWithDefault()">Omitir (Valor 5)</button>
 </div>
 
 <button id="statsBtn" onclick="toggleStats()">STATS</button>
 
 <div id="statsBox" class="hidden">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-    <h2 style="margin:0; color:#5d4037;">ANALYTICS</h2>
-    <button onclick="toggleStats()" style="background:#eee; border-radius:50px;">Cerrar</button>
+    <h2 style="margin:0; color:#5d4037;">ESTADÍSTICAS</h2>
+    <button onclick="toggleStats()" style="background:#eee; border-radius:50px; padding: 8px 15px;">Cerrar</button>
   </div>
   <div id="statsContent"></div>
 </div>
@@ -89,15 +116,46 @@
 <script>
 let data = JSON.parse(localStorage.getItem("cacas")) || [];
 
-document.getElementById("poopBtn").onclick = () => {
+document.getElementById("poopBtn").onclick = function(e) {
+  // Guardamos la base
   data.push({ date: new Date().toISOString(), desc: "", rating: 5, isPerfect: false });
   save();
+  
+  // Instantáneamente: Animación +1 (ahora por encima de todo)
+  showPlusOne(e);
+
+  // --- 2. PEQUEÑO RETRASO (100ms) para mostrar el formulario ---
+  setTimeout(() => {
+    // Preguntamos si quiere hablar, 100ms después
+    document.getElementById("preForm").classList.remove("hidden");
+  }, 100);
+};
+
+function showPlusOne(e) {
+  const plus = document.createElement("div");
+  plus.innerText = "+1";
+  plus.className = "floating-plus";
+  
+  // Posicionar donde se hizo clic (o en el centro)
+  // Usamos e.clientX/Y si hay evento de ratón, sino el centro
+  const x = e.clientX || window.innerWidth / 2;
+  const y = e.clientY || window.innerHeight / 2;
+  
+  plus.style.left = (x - 20) + "px"; // Un poco de offset para centrar el texto
+  plus.style.top = (y - 30) + "px"; 
+  
+  document.body.appendChild(plus);
+  setTimeout(() => { plus.remove(); }, 900); // Coincidir con la animación CSS
+}
+
+function save() { localStorage.setItem("cacas", JSON.stringify(data)); }
+
+function openDetailsForm() {
+  document.getElementById("preForm").classList.add("hidden");
   document.getElementById("rating").value = 5;
   document.getElementById("valRange").innerText = "5";
   document.getElementById("form").classList.remove("hidden");
-};
-
-function save() { localStorage.setItem("cacas", JSON.stringify(data)); }
+}
 
 function saveDetails() {
   const last = data[data.length - 1];
@@ -119,6 +177,7 @@ function savePerfect() {
 function closeWithDefault() { finish(); }
 
 function finish() {
+  document.getElementById("preForm").classList.add("hidden");
   document.getElementById("form").classList.add("hidden");
   document.getElementById("desc").value = "";
 }
@@ -135,16 +194,11 @@ function deletePoop(index) {
 function getBestStreak(days) {
   if (days.length === 0) return 0;
   const sortedDays = Array.from(new Set(days)).sort();
-  let maxStreak = 1;
-  let currentStreak = 1;
+  let maxStreak = 1; let currentStreak = 1;
   for (let i = 1; i < sortedDays.length; i++) {
     const diff = (new Date(sortedDays[i]) - new Date(sortedDays[i-1])) / (1000 * 60 * 60 * 24);
-    if (diff === 1) {
-      currentStreak++;
-    } else {
-      maxStreak = Math.max(maxStreak, currentStreak);
-      currentStreak = 1;
-    }
+    if (Math.round(diff) === 1) currentStreak++;
+    else { maxStreak = Math.max(maxStreak, currentStreak); currentStreak = 1; }
   }
   return Math.max(maxStreak, currentStreak);
 }
@@ -166,14 +220,12 @@ function toggleStats() {
     const mStr = item.date.slice(0, 7);
     const yStr = item.date.slice(0, 4);
     const h = d.getHours();
-    
     sumaRating += parseInt(item.rating);
     if(item.isPerfect) perfects++;
     if(dStr === hoyStr) hoy++;
     if(h >= 6 && h < 14) mapHoras.mañana++;
     else if(h >= 14 && h < 21) mapHoras.tarde++;
     else mapHoras.noche++;
-
     mapDias[dStr] = (mapDias[dStr] || 0) + 1;
     mapMeses[mStr] = true;
     mapAnios[yStr] = true;
@@ -181,7 +233,6 @@ function toggleStats() {
 
   const mediaDiaria = (data.length / Object.keys(mapDias).length).toFixed(2);
   const mediaMensual = (data.length / Object.keys(mapMeses).length).toFixed(2);
-  const mediaAnual = (data.length / Object.keys(mapAnios).length).toFixed(2);
   const rachaHistorica = getBestStreak(Object.keys(mapDias));
   const momentoTop = Object.keys(mapHoras).reduce((a, b) => mapHoras[a] > mapHoras[b] ? a : b);
 
@@ -191,15 +242,10 @@ function toggleStats() {
       <div class="stat-card"><small>Hoy</small><b>${hoy}</b></div>
       <div class="stat-card"><small>Media Diaria</small><b>${mediaDiaria}</b></div>
       <div class="stat-card"><small>Media Mensual</small><b>${mediaMensual}</b></div>
-      <div class="stat-card"><small>Media Anual</small><b>${mediaAnual}</b></div>
-      <div class="stat-card"><small>Mejor Racha</small><b>${rachaHistorica} días</b></div>
-      <div class="stat-card"><small>Rating Medio</small><b>${(sumaRating/data.length).toFixed(1)}/10</b></div>
+      <div class="stat-card"><small>Mejor Racha</small><b>${rachaHistorica} d</b></div>
+      <div class="stat-card"><small>Rating Medio</small><b>${(sumaRating/data.length).toFixed(1)}</b></div>
       <div class="stat-card"><small>Perfects</small><b>${perfects} ✨</b></div>
-    </div>
-
-    <div class="stat-card" style="margin-bottom:20px; text-align:center;">
-       <small>Momento de mayor actividad</small>
-       <b style="text-transform:capitalize;">${momentoTop}</b>
+      <div class="stat-card"><small>Momento Top</small><b style="text-transform:capitalize;">${momentoTop}</b></div>
     </div>
 
     <h3>HISTORIAL</h3>
