@@ -3,52 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CACOUNT - ANALYTICS 💩</title>
+<title>CACOUNT - MEGA 💩</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="https://emojicdn.elk.sh/💩">
+<link rel="apple-touch-icon" href="https://emojicdn.elk.sh/💩">
 
 <style>
   body { 
-    margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; 
-    background: #fff; color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+    margin: 0; 
+    font-family: 'Segoe UI', sans-serif; 
+    text-align: center; 
+    background: #ffffff; 
+    color: #333; 
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
-  h1 { margin: 15px 0; font-size: 1rem; letter-spacing: 3px; color: #8d6e63; opacity: 0.7; }
+  /* 2. CACOUNT más abajo */
+  h1 { 
+    margin: 50px 0 10px 0; /* Más margen arriba */
+    font-size: 1.2rem; 
+    letter-spacing: 4px; 
+    color: #5d4037; 
+    opacity: 0.6; 
+  }
 
-  #mainContainer { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-  #poopBtn { font-size: 55vw; background: none; border: none; cursor: pointer; transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; }
+  /* BOTÓN: Un pelín más pequeño y más alto */
+  #mainContainer {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: -10vh; /* 1. Más alto en la pantalla */
+  }
+
+  #poopBtn { 
+    font-size: 40vw; /* 1. Un pelín más pequeño (era 50vw) */
+    max-font-size: 300px; /* Límite para que no pixele en PC */
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    transition: transform 0.1s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
   #poopBtn:active { transform: scale(1.1); }
 
-  .overlay-box { 
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 320px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 20; border: 1px solid #eee;
+  #plusOne { 
+    position: absolute; 
+    font-size: 60px; 
+    opacity: 0; 
+    transition: 0.6s; 
+    color: #795548; 
+    font-weight: bold; 
+    pointer-events: none; 
+    z-index: 5;
   }
 
-  .range-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; font-size: 1.5rem; }
-  input[type="range"] { flex-grow: 1; accent-color: #5d4037; }
-  textarea { width: 100%; height: 60px; border-radius: 10px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; margin-bottom: 10px; }
-  
-  button { border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; }
-  .btn-save { background: #5d4037; color: white; width: 100%; }
-  
-  #statsBtn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; border-radius: 50%; width: 60px; height: 60px; font-size: 12px; z-index: 10; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+  .overlay-box { 
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.98); 
+    padding: 25px; 
+    border-radius: 20px; 
+    width: 85%; 
+    max-width: 350px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 20;
+    backdrop-filter: blur(5px);
+  }
 
-  /* PANEL DE STATS */
+  textarea { width: 90%; height: 60px; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; padding: 10px; font-family: inherit; box-sizing: border-box;}
+  
+  /* Contenedor del medidor con emojis (3. INVERTIDO) */
+  .range-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+    font-size: 1.5rem;
+  }
+  input[type="range"] { flex-grow: 1; accent-color: #8d6e63; cursor: pointer; }
+
+  button { border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+  .btn-save { background: #5d4037; color: white; width: 100%; font-size: 1rem; }
+
+  #statsBtn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 12px; z-index: 10; display: flex; align-items: center; justify-content: center; border: none;}
+
   #statsBox { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: #fdfcfb; z-index: 1000; overflow-y: auto; padding: 20px; box-sizing: border-box; text-align: left;
+    background: white; z-index: 1000; overflow-y: auto; text-align: left; padding: 25px; box-sizing: border-box;
   }
-
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-  .stat-card { background: white; padding: 12px; border-radius: 15px; border: 1px solid #eee; }
-  .stat-card small { color: #888; font-size: 0.7rem; text-transform: uppercase; display: block; }
-  .stat-card b { font-size: 1.2rem; color: #5d4037; }
   
-  .record-section { background: #efebe9; padding: 15px; border-radius: 15px; margin: 20px 0; }
-  .record-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-
-  .history-list { margin-top: 20px; border-top: 1px solid #eee; }
-  .history-item { padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 0.85rem; }
-
+  .history-item { border-bottom: 1px solid #eee; padding: 12px 0; }
+  .history-date { color: #aaa; font-size: 0.75rem; text-transform: uppercase; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -59,119 +117,127 @@
 
 <div id="mainContainer">
   <button id="poopBtn">💩</button>
+  <div id="plusOne">+1</div>
 </div>
 
 <div id="form" class="overlay-box hidden">
-  <p style="margin: 0; font-weight: bold; text-align: center;">¿Qué tal esa caca?</p>
+  <p style="margin: 0; font-weight: bold;">¿Puntuación de la caca (0-10)?</p>
+  
   <div class="range-container">
-    <span>🤩</span>
-    <input type="range" min="0" max="10" id="rating" value="0" oninput="document.getElementById('valRange').innerText = this.value">
-    <span>🥵</span>
-  </div>
-  <p style="text-align:center; margin-top: -10px; font-size: 0.8rem;">Malestar: <span id="valRange">0</span>/10</p>
-  <textarea id="desc" placeholder="Algún comentario..."></textarea>
+    <span>🥵</span> <input type="range" min="0" max="10" id="rating" value="10" oninput="document.getElementById('valRange').innerText = this.value">
+    <span>🤩</span> </div>
+  <p style="margin-bottom: 10px; font-size: 0.9rem;">Puntos: <span id="valRange" style="font-weight: bold; color: #5d4037;">10</span>/10</p>
+
+  <textarea id="desc" placeholder="Nota opcional..."></textarea>
+  
   <button class="btn-save" onclick="saveDetails()">GUARDAR REGISTRO</button>
 </div>
 
 <button id="statsBtn" onclick="toggleStats()">STATS</button>
 
-<div id="statsBox" class="hidden">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2 style="margin:0; color:#5d4037;">ESTADÍSTICAS</h2>
-    <button onclick="toggleStats()" style="background:#333; color:white;">CERRAR</button>
-  </div>
-
-  <div id="statsContent"></div>
-</div>
+<div id="statsBox" class="hidden"></div>
 
 <script>
 let data = JSON.parse(localStorage.getItem("cacas")) || [];
 
 document.getElementById("poopBtn").onclick = () => {
-  data.push({ date: new Date().toISOString(), desc: "", rating: 0 });
-  localStorage.setItem("cacas", JSON.stringify(data));
+  // 3. Por defecto, asumimos que es una caca 10 (genial)
+  const entry = {
+    date: new Date().toISOString(),
+    desc: "",
+    rating: 10 
+  };
+  data.push(entry);
+  save();
+  animatePoop();
+  
+  // Reset form con rating 10
+  document.getElementById("rating").value = 10;
+  document.getElementById("valRange").innerText = "10";
+  
   document.getElementById("form").classList.remove("hidden");
 };
+
+function save() { localStorage.setItem("cacas", JSON.stringify(data)); }
+
+function animatePoop() {
+  const el = document.getElementById("plusOne");
+  el.style.opacity = 1;
+  el.style.top = "40%";
+  setTimeout(() => {
+    el.style.opacity = 0;
+    el.style.top = "30%";
+  }, 600);
+}
+
+function hideForm() {
+  document.getElementById("form").classList.add("hidden");
+  document.getElementById("desc").value = "";
+}
 
 function saveDetails() {
   if(data.length > 0) {
     data[data.length - 1].desc = document.getElementById("desc").value;
     data[data.length - 1].rating = document.getElementById("rating").value;
-    localStorage.setItem("cacas", JSON.stringify(data));
+    save();
   }
-  document.getElementById("form").classList.add("hidden");
-  document.getElementById("desc").value = "";
-  document.getElementById("rating").value = 0;
+  hideForm();
 }
 
 function toggleStats() {
   const box = document.getElementById("statsBox");
-  if (!box.classList.contains("hidden")) { box.classList.add("hidden"); return; }
-  if (data.length === 0) { alert("Aún no hay datos"); return; }
+  if (!box.classList.contains("hidden")) {
+    box.classList.add("hidden");
+    return;
+  }
 
-  const now = new Date();
-  const hoyStr = now.toISOString().slice(0, 10);
-  
-  // Variables de conteo
-  let hoy = 0, semana = 0, mes = 0;
-  let mapDia = {}, mapMes = {}, mapAnio = {};
+  if (data.length === 0) {
+    box.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>No hay datos todavía... 💩</h2><button onclick='toggleStats()' style='display:block; margin: 0 auto;'>Volver</button>";
+    box.classList.remove("hidden");
+    return;
+  }
 
-  data.forEach(item => {
+  const hoy = new Date().toISOString().slice(0, 10);
+  const hoyCount = data.filter(d => d.date.startsWith(hoy)).length;
+
+  let historyHTML = data.slice().reverse().map(item => {
     const d = new Date(item.date);
-    const dStr = d.toISOString().slice(0, 10);
-    const mStr = d.toISOString().slice(0, 7);
-    const yStr = d.toISOString().slice(0, 4);
+    const fechaStr = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+    const horaStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // 3. Emojis del historial invertidos (Rating alto = 🤩)
+    const emoji = item.rating >= 8 ? "🤩" : (item.rating <= 3 ? "🥵" : "💩");
+    
+    return `
+      <div class="history-item">
+        <div class="history-date">${fechaStr} @ ${horaStr}</div>
+        <div style="margin-top:4px;">
+          <b>${emoji} Puntuación: ${item.rating}/10</b> 
+          ${item.desc ? `<br><span style="color:#555; font-size:0.9rem;">"${item.desc}"</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
 
-    // Totales actuales
-    if (dStr === hoyStr) hoy++;
-    if ((now - d) / (1000*60*60*24) <= 7) semana++;
-    if (mStr === hoyStr.slice(0, 7)) mes++;
-
-    // Agrupar para récords
-    mapDia[dStr] = (mapDia[dStr] || 0) + 1;
-    mapMes[mStr] = (mapMes[mStr] || 0) + 1;
-    mapAnio[yStr] = (mapAnio[yStr] || 0) + 1;
-  });
-
-  const totalDias = Object.keys(mapDia).length || 1;
-  const totalMeses = Object.keys(mapMes).length || 1;
-
-  const html = `
-    <div class="stats-grid">
-      <div class="stat-card"><small>Total</small><b>${data.length}</b></div>
-      <div class="stat-card"><small>Hoy</small><b>${hoy}</b></div>
-      <div class="stat-card"><small>Esta Semana</small><b>${semana}</b></div>
-      <div class="stat-card"><small>Este Mes</small><b>${mes}</b></div>
+  box.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="margin:0; color:#5d4037;">ESTADÍSTICAS</h2>
+      <button onclick="toggleStats()" style="background:#000; color:white; border-radius:50px; padding: 8px 15px;">Cerrar</button>
     </div>
-
-    <div class="stats-grid">
-      <div class="stat-card"><small>Media Diaria</small><b>${(data.length / totalDias).toFixed(2)}</b></div>
-      <div class="stat-card"><small>Media Mensual</small><b>${(data.length / totalMeses).toFixed(2)}</b></div>
+    <div style="display:flex; gap:20px; margin:20px 0; background:#f9f9f9; padding:15px; border-radius:15px; text-align:center;">
+      <div style="flex:1;"><b>Total</b><br><span style="font-size:1.5rem;">${data.length}</span></div>
+      <div style="flex:1; border-left:1px solid #ddd;"><b>Hoy</b><br><span style="font-size:1.5rem;">${hoyCount}</span></div>
     </div>
-
-    <div class="record-section">
-      <h4 style="margin-top:0">🏆 RÉCORDS</h4>
-      <div class="record-row"><span>Diario:</span> <b>${Math.max(...Object.values(mapDia))}</b></div>
-      <div class="record-row"><span>Mensual:</span> <b>${Math.max(...Object.values(mapMes))}</b></div>
-      <div class="record-row"><span>Anual:</span> <b>${Math.max(...Object.values(mapAnio))}</b></div>
-    </div>
-
+    <hr style="border:0; border-top:1px solid #eee;">
     <h3>HISTORIAL</h3>
-    <div class="history-list">
-      ${data.slice().reverse().slice(0,20).map(i => {
-        const d = new Date(i.date);
-        return `<div class="history-item">
-          <b>${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</b> 
-          - Nivel ${i.rating}/10 ${i.desc ? `<br><i>"${i.desc}"</i>` : ''}
-        </div>`;
-      }).join('')}
-    </div>
+    <div>${historyHTML}</div>
   `;
-
-  document.getElementById("statsContent").innerHTML = html;
   box.classList.remove("hidden");
 }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
