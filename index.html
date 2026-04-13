@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CACOUNT - ANALYTICS 💩</title>
+
+<style>
+  body { 
+    margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; 
+    background: #fff; color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+  }
+
+  h1 { margin: 15px 0; font-size: 1rem; letter-spacing: 3px; color: #8d6e63; opacity: 0.7; }
+
+  #mainContainer { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+  #poopBtn { font-size: 55vw; background: none; border: none; cursor: pointer; transition: transform 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; }
+  #poopBtn:active { transform: scale(1.1); }
+
+  .overlay-box { 
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 320px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 20; border: 1px solid #eee;
+  }
+
+  .range-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; font-size: 1.5rem; }
+  input[type="range"] { flex-grow: 1; accent-color: #5d4037; }
+  textarea { width: 100%; height: 60px; border-radius: 10px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; margin-bottom: 10px; }
+  
+  button { border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+  .btn-save { background: #5d4037; color: white; width: 100%; }
+  
+  #statsBtn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; border-radius: 50%; width: 60px; height: 60px; font-size: 12px; z-index: 10; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+  /* PANEL DE STATS */
+  #statsBox { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: #fdfcfb; z-index: 1000; overflow-y: auto; padding: 20px; box-sizing: border-box; text-align: left;
+  }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+  .stat-card { background: white; padding: 12px; border-radius: 15px; border: 1px solid #eee; }
+  .stat-card small { color: #888; font-size: 0.7rem; text-transform: uppercase; display: block; }
+  .stat-card b { font-size: 1.2rem; color: #5d4037; }
+  
+  .record-section { background: #efebe9; padding: 15px; border-radius: 15px; margin: 20px 0; }
+  .record-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+
+  .history-list { margin-top: 20px; border-top: 1px solid #eee; }
+  .history-item { padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 0.85rem; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+
+<body>
+
+<h1>CACOUNT</h1>
+
+<div id="mainContainer">
+  <button id="poopBtn">💩</button>
+</div>
+
+<div id="form" class="overlay-box hidden">
+  <p style="margin: 0; font-weight: bold; text-align: center;">¿Qué tal esa caca?</p>
+  <div class="range-container">
+    <span>🤩</span>
+    <input type="range" min="0" max="10" id="rating" value="0" oninput="document.getElementById('valRange').innerText = this.value">
+    <span>🥵</span>
+  </div>
+  <p style="text-align:center; margin-top: -10px; font-size: 0.8rem;">Malestar: <span id="valRange">0</span>/10</p>
+  <textarea id="desc" placeholder="Algún comentario..."></textarea>
+  <button class="btn-save" onclick="saveDetails()">GUARDAR REGISTRO</button>
+</div>
+
+<button id="statsBtn" onclick="toggleStats()">STATS</button>
+
+<div id="statsBox" class="hidden">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2 style="margin:0; color:#5d4037;">ESTADÍSTICAS</h2>
+    <button onclick="toggleStats()" style="background:#333; color:white;">CERRAR</button>
+  </div>
+
+  <div id="statsContent"></div>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("cacas")) || [];
+
+document.getElementById("poopBtn").onclick = () => {
+  data.push({ date: new Date().toISOString(), desc: "", rating: 0 });
+  localStorage.setItem("cacas", JSON.stringify(data));
+  document.getElementById("form").classList.remove("hidden");
+};
+
+function saveDetails() {
+  if(data.length > 0) {
+    data[data.length - 1].desc = document.getElementById("desc").value;
+    data[data.length - 1].rating = document.getElementById("rating").value;
+    localStorage.setItem("cacas", JSON.stringify(data));
+  }
+  document.getElementById("form").classList.add("hidden");
+  document.getElementById("desc").value = "";
+  document.getElementById("rating").value = 0;
+}
+
+function toggleStats() {
+  const box = document.getElementById("statsBox");
+  if (!box.classList.contains("hidden")) { box.classList.add("hidden"); return; }
+  if (data.length === 0) { alert("Aún no hay datos"); return; }
+
+  const now = new Date();
+  const hoyStr = now.toISOString().slice(0, 10);
+  
+  // Variables de conteo
+  let hoy = 0, semana = 0, mes = 0;
+  let mapDia = {}, mapMes = {}, mapAnio = {};
+
+  data.forEach(item => {
+    const d = new Date(item.date);
+    const dStr = d.toISOString().slice(0, 10);
+    const mStr = d.toISOString().slice(0, 7);
+    const yStr = d.toISOString().slice(0, 4);
+
+    // Totales actuales
+    if (dStr === hoyStr) hoy++;
+    if ((now - d) / (1000*60*60*24) <= 7) semana++;
+    if (mStr === hoyStr.slice(0, 7)) mes++;
+
+    // Agrupar para récords
+    mapDia[dStr] = (mapDia[dStr] || 0) + 1;
+    mapMes[mStr] = (mapMes[mStr] || 0) + 1;
+    mapAnio[yStr] = (mapAnio[yStr] || 0) + 1;
+  });
+
+  const totalDias = Object.keys(mapDia).length || 1;
+  const totalMeses = Object.keys(mapMes).length || 1;
+
+  const html = `
+    <div class="stats-grid">
+      <div class="stat-card"><small>Total</small><b>${data.length}</b></div>
+      <div class="stat-card"><small>Hoy</small><b>${hoy}</b></div>
+      <div class="stat-card"><small>Esta Semana</small><b>${semana}</b></div>
+      <div class="stat-card"><small>Este Mes</small><b>${mes}</b></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><small>Media Diaria</small><b>${(data.length / totalDias).toFixed(2)}</b></div>
+      <div class="stat-card"><small>Media Mensual</small><b>${(data.length / totalMeses).toFixed(2)}</b></div>
+    </div>
+
+    <div class="record-section">
+      <h4 style="margin-top:0">🏆 RÉCORDS</h4>
+      <div class="record-row"><span>Diario:</span> <b>${Math.max(...Object.values(mapDia))}</b></div>
+      <div class="record-row"><span>Mensual:</span> <b>${Math.max(...Object.values(mapMes))}</b></div>
+      <div class="record-row"><span>Anual:</span> <b>${Math.max(...Object.values(mapAnio))}</b></div>
+    </div>
+
+    <h3>HISTORIAL</h3>
+    <div class="history-list">
+      ${data.slice().reverse().slice(0,20).map(i => {
+        const d = new Date(i.date);
+        return `<div class="history-item">
+          <b>${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</b> 
+          - Nivel ${i.rating}/10 ${i.desc ? `<br><i>"${i.desc}"</i>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  document.getElementById("statsContent").innerHTML = html;
+  box.classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
