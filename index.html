@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CACOUNT 💩</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,31 +29,67 @@
   }
   #poopBtn:active { transform: scale(1.1); }
 
-  /* --- 1. AJUSTE DE LA ANIMACIÓN +1 (Ahora en capa superior) --- */
   .floating-plus {
-    position: fixed; /* Mejor fixed para que la posición sea exacta sobre la pantalla */
-    font-size: 3.5rem; /* Un pelín más grande para que se vea mejor */
+    position: fixed;
+    font-size: 3.5rem;
     font-weight: bold; 
     color: #795548;
     pointer-events: none; 
-    animation: floatUp 0.9s ease-out forwards; /* Un poco más lenta para disfrutarla */
-    z-index: 2000; /* Super alto para estar POR ENCIMA de los formularios (z-index 20/1000) */
+    animation: floatUp 0.9s ease-out forwards;
+    z-index: 2000;
   }
 
   @keyframes floatUp {
     0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-120px); opacity: 0; } /* Sube un poco más */
+    100% { transform: translateY(-120px); opacity: 0; }
   }
 
   .overlay-box { 
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 350px;
+    background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 380px;
     box-shadow: 0 15px 50px rgba(0,0,0,0.3); z-index: 20; border: 1px solid #eee;
+    max-height: 90vh; overflow-y: auto;
   }
 
-  .range-container { display: flex; align-items: center; gap: 10px; margin: 15px 0; font-size: 1.5rem; }
+  .tags-container { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 8px; 
+    margin: 15px 0; 
+  }
+  .tag-btn {
+    background: #f0f0f0; border: 1px solid #ddd; padding: 8px 4px; border-radius: 10px;
+    font-size: 0.75rem; cursor: pointer; transition: 0.2s; color: #555;
+  }
+  .tag-btn.active {
+    background: #8d6e63; color: white; border-color: #5d4037;
+  }
+
+  /* Estilo para el input de tiempo */
+  .time-editor {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+  .time-editor input {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+
+  .range-container { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 1.5rem; }
   input[type="range"] { flex-grow: 1; accent-color: #8d6e63; }
-  textarea { width: 100%; height: 60px; border-radius: 12px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; margin: 10px 0; font-family: inherit; }
+  
+  textarea { width: 100%; height: 50px; border-radius: 12px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; margin: 10px 0; font-family: inherit; font-size: 0.9rem; }
   
   button { border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
   .btn-yes { background: #5d4037; color: white; width: 100%; margin-bottom: 8px; }
@@ -69,8 +105,8 @@
   .stat-card small { color: #9e8d88; font-size: 0.65rem; text-transform: uppercase; display: block; margin-bottom: 4px; }
   .stat-card b { font-size: 1.1rem; color: #5d4037; }
 
-  .history-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
-  .btn-delete { background: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; }
+  .history-item { border-bottom: 1px solid #eee; padding: 12px 0; }
+  .btn-delete { background: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; float: right; }
   
   .hidden { display: none !important; }
 </style>
@@ -78,29 +114,48 @@
 
 <body>
 
-<h1>CACOUNT </h1>
+<h1>CACOUNT</h1>
 
 <div id="mainContainer">
   <button id="poopBtn">💩</button>
 </div>
 
 <div id="preForm" class="overlay-box hidden">
-  <p style="margin: 0 0 15px 0; font-weight: bold;">¿Quieres hablar de tu caca?</p>
-  <button class="btn-yes" onclick="openDetailsForm()">SÍ</button>
-  <button class="btn-no" onclick="closeWithDefault()">NO</button>
+  <p style="margin: 0 0 15px 0; font-weight: bold;">¿Quieres detalles?</p>
+  <button class="btn-yes" onclick="openDetailsForm()">SÍ, ANALIZAR</button>
+  <button class="btn-no" onclick="closeWithDefault()">AHORA NO</button>
 </div>
 
 <div id="form" class="overlay-box hidden">
-  <p style="margin: 0; font-weight: bold;">¡Cuéntame!</p>
+  <p style="margin: 0; font-weight: bold;">¿Cómo ha sido?</p>
+  
+  <div class="time-editor">
+    <span>🕒 Hora:</span>
+    <input type="time" id="editTime">
+  </div>
+
+  <div class="tags-container" id="tagsContainer">
+    <button class="tag-btn" onclick="toggleTag(this)">💧 Líquida</button>
+    <button class="tag-btn" onclick="toggleTag(this)">🪨 Dura</button>
+    <button class="tag-btn" onclick="toggleTag(this)">🌪️ Mix</button>
+    <button class="tag-btn" onclick="toggleTag(this)">⛵ Flotante</button>
+    <button class="tag-btn" onclick="toggleTag(this)">🔥 Picante</button>
+    <button class="tag-btn" onclick="toggleTag(this)">😫 Dolorosa</button>
+    <button class="tag-btn" onclick="toggleTag(this)">🩸 Sangre</button>
+    <button class="tag-btn" onclick="toggleTag(this)">🐐 Bolitas</button>
+    <button class="tag-btn" onclick="toggleTag(this)">🧱 Ladrillo</button>
+  </div>
+
   <div class="range-container">
     <span>🥵</span>
     <input type="range" min="0" max="10" id="rating" value="5" oninput="document.getElementById('valRange').innerText = this.value">
     <span>🤩</span>
   </div>
-  <p style="text-align:center; margin-top: -10px; font-size: 0.8rem;">Puntuación: <span id="valRange">5</span>/10</p>
+  <p style="text-align:center; margin-top: -10px; font-size: 0.8rem;">Calidad: <span id="valRange">5</span>/10</p>
+  
   <button class="btn-perfect" onclick="savePerfect()">✨ ¡PERFECT! ✨</button>
-  <textarea id="desc" placeholder="Nota opcional..."></textarea>
-  <button class="btn-save" onclick="saveDetails()">GUARDAR</button>
+  <textarea id="desc" placeholder="Otras notas..."></textarea>
+  <button class="btn-save" onclick="saveDetails()">GUARDAR REGISTRO</button>
 </div>
 
 <button id="statsBtn" onclick="toggleStats()">STATS</button>
@@ -115,18 +170,14 @@
 
 <script>
 let data = JSON.parse(localStorage.getItem("cacas")) || [];
+let selectedTags = [];
 
 document.getElementById("poopBtn").onclick = function(e) {
-  // Guardamos la base
+  // Al hacer clic, guardamos la fecha actual como base
   data.push({ date: new Date().toISOString(), desc: "", rating: 5, isPerfect: false });
   save();
-  
-  // Instantáneamente: Animación +1 (ahora por encima de todo)
   showPlusOne(e);
-
-  // --- 2. PEQUEÑO RETRASO (100ms) para mostrar el formulario ---
   setTimeout(() => {
-    // Preguntamos si quiere hablar, 100ms después
     document.getElementById("preForm").classList.remove("hidden");
   }, 100);
 };
@@ -135,40 +186,68 @@ function showPlusOne(e) {
   const plus = document.createElement("div");
   plus.innerText = "+1";
   plus.className = "floating-plus";
-  
-  // Posicionar donde se hizo clic (o en el centro)
-  // Usamos e.clientX/Y si hay evento de ratón, sino el centro
   const x = e.clientX || window.innerWidth / 2;
   const y = e.clientY || window.innerHeight / 2;
-  
-  plus.style.left = (x - 20) + "px"; // Un poco de offset para centrar el texto
+  plus.style.left = (x - 20) + "px";
   plus.style.top = (y - 30) + "px"; 
-  
   document.body.appendChild(plus);
-  setTimeout(() => { plus.remove(); }, 900); // Coincidir con la animación CSS
+  setTimeout(() => { plus.remove(); }, 900);
 }
 
 function save() { localStorage.setItem("cacas", JSON.stringify(data)); }
 
+function toggleTag(btn) {
+  btn.classList.toggle('active');
+  const tagName = btn.innerText;
+  if(selectedTags.includes(tagName)) {
+    selectedTags = selectedTags.filter(t => t !== tagName);
+  } else {
+    selectedTags.push(tagName);
+  }
+}
+
 function openDetailsForm() {
   document.getElementById("preForm").classList.add("hidden");
-  document.getElementById("rating").value = 5;
-  document.getElementById("valRange").innerText = "5";
   document.getElementById("form").classList.remove("hidden");
+  
+  // Reset de tags
+  selectedTags = [];
+  document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+
+  // Poner la hora actual en el editor por defecto
+  const ahora = new Date();
+  const horas = String(ahora.getHours()).padStart(2, '0');
+  const minutos = String(ahora.getMinutes()).padStart(2, '0');
+  document.getElementById("editTime").value = `${horas}:${minutos}`;
+}
+
+function updateLastEntryTime() {
+  const timeVal = document.getElementById("editTime").value; // Formato "HH:MM"
+  if (timeVal) {
+    const last = data[data.length - 1];
+    const originalDate = new Date(last.date);
+    const [h, m] = timeVal.split(":");
+    originalDate.setHours(h);
+    originalDate.setMinutes(m);
+    last.date = originalDate.toISOString();
+  }
 }
 
 function saveDetails() {
+  updateLastEntryTime(); // Actualizamos la hora antes de guardar todo
   const last = data[data.length - 1];
-  last.desc = document.getElementById("desc").value;
+  const manualDesc = document.getElementById("desc").value;
+  last.desc = (selectedTags.join(", ") + " " + manualDesc).trim();
   last.rating = parseInt(document.getElementById("rating").value);
   save();
   finish();
 }
 
 function savePerfect() {
+  updateLastEntryTime();
   const last = data[data.length - 1];
   last.rating = 10;
-  last.desc = "¡Perfect! Papel limpio ✨";
+  last.desc = "✨ ¡Perfect! Papel limpio";
   last.isPerfect = true;
   save();
   finish();
@@ -183,7 +262,7 @@ function finish() {
 }
 
 function deletePoop(index) {
-  if(confirm("¿Seguro que quieres borrar este registro?")) {
+  if(confirm("¿Seguro?")) {
     const realIndex = data.length - 1 - index;
     data.splice(realIndex, 1);
     save();
@@ -206,7 +285,11 @@ function getBestStreak(days) {
 function toggleStats() {
   const box = document.getElementById("statsBox");
   if (!box.classList.contains("hidden")) { box.classList.add("hidden"); return; }
-  if (data.length === 0) { box.innerHTML = "<button onclick='toggleStats()'>Volver</button><p>No hay datos.</p>"; box.classList.remove("hidden"); return; }
+  if (data.length === 0) { box.innerHTML = "<div style='padding:20px'><button onclick='toggleStats()'>Cerrar</button><p>No hay datos.</p></div>"; box.classList.remove("hidden"); return; }
+
+  // Ordenar datos por fecha antes de mostrar stats (por si se editaron horas)
+  data.sort((a, b) => new Date(a.date) - new Date(b.date));
+  save();
 
   const now = new Date();
   const hoyStr = now.toISOString().slice(0, 10);
@@ -253,12 +336,12 @@ function toggleStats() {
       const d = new Date(i.date);
       return `
         <div class="history-item">
+          <button class="btn-delete" onclick="deletePoop(${idx})">Eliminar</button>
           <div style="text-align:left">
             <small style="color:#aaa">${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small><br>
             <b>${i.rating >= 8 ? '🤩' : (i.rating <= 3 ? '🥵' : '💩')} ${i.rating}/10</b> 
-            <span style="font-size:0.8rem; color:#666">${i.desc ? ` - ${i.desc}` : ''}</span>
+            <p style="font-size:0.85rem; color:#666; margin: 4px 0 0 0;">${i.desc || 'Sin descripción'}</p>
           </div>
-          <button class="btn-delete" onclick="deletePoop(${idx})">Borrar</button>
         </div>
       `;
     }).join('')}
