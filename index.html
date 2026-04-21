@@ -42,16 +42,25 @@
   .overlay-box { 
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
     background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 380px;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.3); z-index: 20; border: 1px solid #eee;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3); z-index: 2001; border: 1px solid #eee;
     max-height: 90vh; overflow-y: auto;
   }
 
+  /* Estilo para el nuevo desplegable */
+  .section-title { font-size: 0.75rem; font-weight: bold; color: #8d6e63; text-transform: uppercase; margin: 15px 0 5px 0; text-align: left; border-bottom: 1px solid #eee; }
+  
+  .bristol-select {
+    width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #8d6e63;
+    background: #fdfaf8; color: #5d4037; font-weight: bold; margin-bottom: 10px; font-family: inherit; font-size: 0.9rem;
+  }
+
   .tags-container { 
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; 
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; 
   }
   .tag-btn {
     background: #f0f0f0; border: 1px solid #ddd; padding: 10px 4px; border-radius: 10px;
     font-size: 0.75rem; cursor: pointer; transition: 0.2s; color: #555; font-weight: bold;
+    user-select: none;
   }
   .tag-btn.active { background: #8d6e63; color: white; border-color: #5d4037; }
 
@@ -78,7 +87,8 @@
   .stat-card b { font-size: 1.1rem; color: #5d4037; }
 
   .history-item { border-bottom: 1px solid #eee; padding: 12px 0; position: relative; }
-  .btn-delete { background: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; float: right; }
+  .btn-delete { background: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; float: right; margin-left: 5px; }
+  .btn-edit { background: #e3f2fd; color: #1976d2; padding: 5px 10px; border-radius: 8px; font-size: 0.7rem; float: right; }
   
   .hidden { display: none !important; }
 </style>
@@ -94,34 +104,50 @@
 
 <div id="preForm" class="overlay-box hidden">
   <p style="margin: 0 0 15px 0; font-weight: bold;">¿Quieres hablar de esa caca?</p>
-  <button class="btn-yes" onclick="openDetailsForm()">SÍ</button>
+  <button class="btn-yes" onclick="openDetailsForm(false)">SÍ</button>
   <button class="btn-no" onclick="closeWithDefault()">NO</button>
 </div>
 
 <div id="form" class="overlay-box hidden">
-  <p style="margin: 0; font-weight: bold;">Cuéntame más</p>
+  <p id="formTitle" style="margin: 0; font-weight: bold;">Cuéntame más</p>
   
   <div class="time-editor">
     <span>🕒 Hora:</span>
     <input type="time" id="editTime">
   </div>
 
+  <div class="section-title">Escala de Bristol</div>
+  <select id="bristolScale" class="bristol-select">
+    <option value="">¿Cómo se veía?</option>
+    <option value="Tipo 1">Tipo 1: Bolas duras</option>
+    <option value="Tipo 2">Tipo 2: Salchicha con bultos</option>
+    <option value="Tipo 3">Tipo 3: Salchicha agrietada</option>
+    <option value="Tipo 4">Tipo 4: Salchicha lisa</option>
+    <option value="Tipo 5">Tipo 5: Trozos blandos definidos</option>
+    <option value="Tipo 6">Tipo 6: Trozos blandos deshechos</option>
+    <option value="Tipo 7">Tipo 7: Acuosa</option>
+  </select>
+
+  <div class="section-title">Etiquetas</div>
   <div class="tags-container" id="tagsContainer">
-    <button class="tag-btn" onclick="toggleTag(this)">💧 Líquida</button>
-    <button class="tag-btn" onclick="toggleTag(this)">🪨 Dura</button>
-    <button class="tag-btn" onclick="toggleTag(this)">⛵ Flotante</button>
-    <button class="tag-btn" onclick="toggleTag(this)">🔥 Picante</button>
-    <button class="tag-btn" onclick="toggleTag(this)">😫 Dolorosa</button>
-    <button class="tag-btn" onclick="toggleTag(this)">🩸 Sangre</button>
-    <button class="tag-btn" onclick="toggleTag(this)">🐐 Bolitas</button>
-    <button class="tag-btn" onclick="toggleTag(this)">💨 Explosiva</button>
-    <button class="tag-btn" onclick="toggleTag(this)">⚡ Express</button>
-    <button class="tag-btn" onclick="toggleTag(this)">⏳ Interminable</button>
-    <button class="tag-btn" onclick="toggleTag(this)">🏃 Casi no llego</button>
-    <button class="tag-btn" onclick="toggleTag(this)">🚾 Fuera de casa</button>
+    <button id="tag-liquida" class="tag-btn" onclick="toggleTag(this)">💧 Líquida</button>
+    <button id="tag-dura" class="tag-btn" onclick="toggleTag(this)">🪨 Dura</button>
+    <button id="tag-pastosa" class="tag-btn" onclick="toggleTag(this)">🍮 Pastosa</button>
+    <button id="tag-olorosa" class="tag-btn" onclick="toggleTag(this)">👃 Olorosa</button> 
+    <button id="tag-explosiva" class="tag-btn" onclick="toggleTag(this)">💨 Explosiva</button>
+    <button id="tag-flotante" class="tag-btn" onclick="toggleTag(this)">⛵ Flotante</button>
+    <button id="tag-picante" class="tag-btn" onclick="toggleTag(this)">🔥 Picante</button>
+    <button id="tag-dolorosa" class="tag-btn" onclick="toggleTag(this)">😫 Dolorosa</button>
+    <button id="tag-sangre" class="tag-btn" onclick="toggleTag(this)">🩸 Sangre</button>
+    <button id="tag-bolitas" class="tag-btn" onclick="toggleTag(this)">🐐 Bolitas</button>
+    <button id="tag-regla" class="tag-btn" onclick="toggleTag(this)">🤷‍♀️ Caca de regla</button>
+    <button id="tag-express" class="tag-btn" onclick="toggleTag(this)">⚡ Express</button>
+    <button id="tag-interminable" class="tag-btn" onclick="toggleTag(this)">⏳ Interminable</button>
+    <button id="tag-casi" class="tag-btn" onclick="toggleTag(this)">🏃 Casi no llego</button>
+    <button id="tag-fuera" class="tag-btn" onclick="toggleTag(this)">🚾 Fuera de casa</button>
   </div>
   
-  <button class="btn-perfect" onclick="savePerfect()">✨ ¡PERFECT! ✨</button>
+  <button class="btn-perfect" id="perfectBtn" onclick="savePerfect()">✨ ¡PERFECT! ✨</button>
   <textarea id="desc" placeholder="Otras notas..."></textarea>
   <button class="btn-save" onclick="saveDetails()">GUARDAR CACA</button>
 </div>
@@ -139,14 +165,25 @@
 <script>
 let data = JSON.parse(localStorage.getItem("cacas")) || [];
 let selectedTags = [];
+let editingIndex = null; 
 
+// Mapa actualizado con todas tus nuevas etiquetas
+const tagIdMap = {
+  "💧 Líquida": "tag-liquida", "🪨 Dura": "tag-dura", "⛵ Flotante": "tag-flotante",
+  "🔥 Picante": "tag-picante", "😫 Dolorosa": "tag-dolorosa", "🩸 Sangre": "tag-sangre",
+  "🐐 Bolitas": "tag-bolitas", "💨 Explosiva": "tag-explosiva", "⚡ Express": "tag-express",
+  "⏳ Interminable": "tag-interminable", "🏃 Casi no llego": "tag-casi", "🚾 Fuera de casa": "tag-fuera",
+  "🍮 Pastosa": "tag-pastosa", "👃 Olorosa": "tag-olorosa", "🤷‍♀️ Caca de regla": "tag-regla"
+};
+
+// --- CORE ---
 document.getElementById("poopBtn").onclick = function(e) {
-  data.push({ date: new Date().toISOString(), desc: "", isPerfect: false });
+  editingIndex = null;
+  const nuevaCaca = { date: new Date().toISOString(), desc: "", tags: [], bristol: "", isPerfect: false, edited: false };
+  data.push(nuevaCaca);
   save();
   showPlusOne(e);
-  setTimeout(() => {
-    document.getElementById("preForm").classList.remove("hidden");
-  }, 100);
+  setTimeout(() => { document.getElementById("preForm").classList.remove("hidden"); }, 100);
 };
 
 function showPlusOne(e) {
@@ -173,121 +210,166 @@ function toggleTag(btn) {
   }
 }
 
-function openDetailsForm() {
+function openDetailsForm(isEditing = false) {
   document.getElementById("preForm").classList.add("hidden");
   document.getElementById("form").classList.remove("hidden");
-  selectedTags = [];
   document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
-  const ahora = new Date();
-  const horas = String(ahora.getHours()).padStart(2, '0');
-  const minutos = String(ahora.getMinutes()).padStart(2, '0');
-  document.getElementById("editTime").value = `${horas}:${minutos}`;
-}
-
-function updateLastEntryTime() {
-  const timeVal = document.getElementById("editTime").value;
-  if (timeVal) {
-    const last = data[data.length - 1];
-    const originalDate = new Date(last.date);
-    const [h, m] = timeVal.split(":");
-    originalDate.setHours(h);
-    originalDate.setMinutes(m);
-    last.date = originalDate.toISOString();
-  }
+  
+  const targetIndex = isEditing ? editingIndex : data.length - 1;
+  const target = data[targetIndex];
+  const fechaRelativa = new Date(target.date);
+  
+  document.getElementById("editTime").value = `${String(fechaRelativa.getHours()).padStart(2, '0')}:${String(fechaRelativa.getMinutes()).padStart(2, '0')}`;
+  document.getElementById("desc").value = target.desc || "";
+  document.getElementById("bristolScale").value = target.bristol || "";
+  
+  selectedTags = isEditing ? [...(target.tags || [])] : [];
+  selectedTags.forEach(tagText => {
+    const id = tagIdMap[tagText];
+    if(id) { const btn = document.getElementById(id); if(btn) btn.classList.add('active'); }
+  });
+  
+  document.getElementById("perfectBtn").classList.toggle("hidden", isEditing);
+  document.getElementById("formTitle").innerText = isEditing ? "Editar Registro (Único)" : "Cuéntame más";
 }
 
 function saveDetails() {
-  updateLastEntryTime();
-  const last = data[data.length - 1];
-  const manualDesc = document.getElementById("desc").value;
-  last.desc = (selectedTags.join(", ") + " " + manualDesc).trim();
+  const index = (editingIndex !== null) ? editingIndex : data.length - 1;
+  const target = data[index];
+  const timeVal = document.getElementById("editTime").value;
+  const originalDate = new Date(target.date);
+  const [h, m] = timeVal.split(":");
+  originalDate.setHours(h); originalDate.setMinutes(m);
+  
+  target.date = originalDate.toISOString();
+  target.tags = [...selectedTags];
+  target.bristol = document.getElementById("bristolScale").value;
+  target.desc = document.getElementById("desc").value.trim();
+  
+  if (editingIndex !== null) target.edited = true;
   save();
   finish();
 }
 
 function savePerfect() {
-  updateLastEntryTime();
-  const last = data[data.length - 1];
-  last.desc = "✨ ¡Perfect! Papel limpio";
-  last.isPerfect = true;
+  const target = data[data.length - 1];
+  target.tags = ["✨ Perfect!"];
+  target.bristol = "Tipo 4"; // Bristol ideal
+  target.isPerfect = true;
   save();
   finish();
 }
-
-function closeWithDefault() { finish(); }
 
 function finish() {
   document.getElementById("preForm").classList.add("hidden");
   document.getElementById("form").classList.add("hidden");
   document.getElementById("desc").value = "";
+  document.getElementById("bristolScale").value = "";
+  selectedTags = []; editingIndex = null;
+  if(!document.getElementById("statsBox").classList.contains("hidden")) { toggleStats(); toggleStats(); }
 }
 
-function deletePoop(index) {
-  if(confirm("¿Seguro?")) {
-    const realIndex = data.length - 1 - index;
+function deletePoop(idxInverted) {
+  if(confirm("¿Seguro que quieres borrar este registro?")) {
+    const realIndex = data.length - 1 - idxInverted;
     data.splice(realIndex, 1);
     save();
     toggleStats(); toggleStats();
   }
 }
 
+function editPoop(idxInverted) {
+  const realIndex = data.length - 1 - idxInverted;
+  if (data[realIndex].edited) return;
+  if(confirm("Solo puedes editar esta caca una vez, asegúrate de hacerlo correctamente!")) {
+    editingIndex = realIndex;
+    openDetailsForm(true);
+  }
+}
+
+function closeWithDefault() { finish(); }
+
+// --- STATS LOGIC ---
 function toggleStats() {
   const box = document.getElementById("statsBox");
   if (!box.classList.contains("hidden")) { box.classList.add("hidden"); return; }
-  if (data.length === 0) { box.innerHTML = "<div style='padding:20px'><button onclick='toggleStats()'>Cerrar</button><p>No hay datos.</p></div>"; box.classList.remove("hidden"); return; }
+  if (data.length === 0) { 
+    box.innerHTML = "<div style='padding:25px'><button onclick='toggleStats()'>Cerrar</button><p>No hay datos.</p></div>"; 
+    box.classList.remove("hidden"); return; 
+  }
 
   data.sort((a, b) => new Date(a.date) - new Date(b.date));
-  save();
+  
+  const dates = [...new Set(data.map(i => i.date.slice(0, 10)))].sort();
+  let maxStreak = 0, currentStreak = 0, tempStreak = 1;
+  for (let i = 0; i < dates.length; i++) {
+    if (i > 0) {
+      const d1 = new Date(dates[i-1]);
+      const d2 = new Date(dates[i]);
+      tempStreak = ((d2 - d1) / 86400000 === 1) ? tempStreak + 1 : 1;
+    }
+    maxStreak = Math.max(maxStreak, tempStreak);
+  }
 
-  const now = new Date();
-  const hoyStr = now.toISOString().slice(0, 10);
-  let hoy = 0, perfects = 0;
-  let mapHoras = { mañana: 0, tarde: 0, noche: 0 };
-  let mapDias = {};
+  const hoyStr = new Date().toISOString().slice(0, 10);
+  let hoy = 0, perfects = 0, mapDias = {}, tagCounts = {}, timeCounts = { Mañana: 0, Tarde: 0, Noche: 0 };
 
   data.forEach(item => {
     const d = new Date(item.date);
-    const dStr = item.date.slice(0, 10);
     const h = d.getHours();
     if(item.isPerfect) perfects++;
-    if(dStr === hoyStr) hoy++;
-    if(h >= 6 && h < 14) mapHoras.mañana++;
-    else if(h >= 14 && h < 21) mapHoras.tarde++;
-    else mapHoras.noche++;
-    mapDias[dStr] = (mapDias[dStr] || 0) + 1;
+    if(item.date.slice(0, 10) === hoyStr) hoy++;
+    mapDias[item.date.slice(0, 10)] = true;
+
+    if(h >= 6 && h < 14) timeCounts.Mañana++;
+    else if(h >= 14 && h < 21) timeCounts.Tarde++;
+    else timeCounts.Noche++;
+
+    if(item.tags) {
+      item.tags.forEach(t => {
+        if(t !== "✨ Perfect!") tagCounts[t] = (tagCounts[t] || 0) + 1;
+      });
+    }
   });
 
-  const mediaDiaria = (data.length / Object.keys(mapDias).length).toFixed(2);
-  const momentoTop = Object.keys(mapHoras).reduce((a, b) => mapHoras[a] > mapHoras[b] ? a : b);
+  const momentoTop = Object.keys(timeCounts).reduce((a, b) => timeCounts[a] > timeCounts[b] ? a : b);
+  const tagTop = Object.keys(tagCounts).length > 0 ? Object.keys(tagCounts).reduce((a, b) => tagCounts[a] > tagCounts[b] ? a : b) : "Ninguna";
+  const mediaDiaria = (data.length / Object.keys(mapDias).length).toFixed(1);
 
   const html = `
     <div class="stat-grid">
+      <div class="stat-card"><small>Racha Actual</small><b>${currentStreak} días 🔥</b></div>
+      <div class="stat-card"><small>Mejor Racha</small><b>${maxStreak} ⭐</b></div>
       <div class="stat-card"><small>Total</small><b>${data.length} 💩</b></div>
       <div class="stat-card"><small>Hoy</small><b>${hoy}</b></div>
-      <div class="stat-card"><small>Media Diaria</small><b>${mediaDiaria}</b></div>
+      <div class="stat-card"><small>Media</small><b>${mediaDiaria}/día</b></div>
       <div class="stat-card"><small>Perfects</small><b>${perfects} ✨</b></div>
-      <div class="stat-card"><small>Momento Top</small><b style="text-transform:capitalize;">${momentoTop}</b></div>
+      <div class="stat-card"><small>Momento Top</small><b>${momentoTop} 🕒</b></div>
+      <div class="stat-card"><small>Caca + típica</small><b>${tagTop}</b></div>
     </div>
-
     <h3>HISTORIAL</h3>
     ${data.slice().reverse().map((i, idx) => {
       const d = new Date(i.date);
+      let visualDesc = "";
+      // Añadir Bristol al historial si existe
+      if(i.bristol) visualDesc += `<span style="background:#8d6e63; color:white; padding:2px 6px; border-radius:5px; font-size:0.7rem; margin-right:5px;">${i.bristol}</span> `;
+      if(i.tags && i.tags.length > 0) visualDesc += `<b>${i.tags.join(", ")}</b>`;
+      if(i.desc) visualDesc += (visualDesc ? " - " : "") + i.desc;
       return `
         <div class="history-item">
           <button class="btn-delete" onclick="deletePoop(${idx})">Borrar</button>
+          ${!i.edited ? `<button class="btn-edit" onclick="editPoop(${idx})">Editar</button>` : `<small style="float:right; color:#4caf50; font-weight:bold;">EDITADO ✓</small>`}
           <div style="text-align:left">
             <small style="color:#aaa">${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small><br>
-            <p style="font-size:0.9rem; color:#333; margin: 4px 0 0 0;">${i.desc || '💩 Registro normal'}</p>
+            <p style="font-size:0.9rem; color:#333; margin: 4px 0 0 0;">${visualDesc || '💩 Registro normal'}</p>
           </div>
         </div>
       `;
     }).join('')}
   `;
-
   document.getElementById("statsContent").innerHTML = html;
   box.classList.remove("hidden");
 }
 </script>
-
 </body>
 </html>
